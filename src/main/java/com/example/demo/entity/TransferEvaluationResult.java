@@ -1,7 +1,7 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.sql.timestamp;
 
 @Entity
 @Table(name = "transfer_evaluation_results")
@@ -21,8 +21,10 @@ public class TransferEvaluationResult {
     private Integer creditHourDifference;
     private Boolean isEligibleForTransfer;
 
-    @Column(nullable = false)
-    private LocalDateTime evaluatedAt = LocalDateTime.now();
+    
+    @Column(nullable = false, updatable = false)
+    private Timestamp evaluatedAt =
+            new Timestamp(System.currentTimeMillis());
 
     private String notes;
 
