@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/transfer-evaluations")
 @Tag(name = "Transfer Evaluation API")
-public class TransferEvaluationController {
+public class TransferEvaluationResultController {
 
     @Autowired
     private TransferEvaluationService service;
