@@ -1,8 +1,8 @@
-package com.example.app.repository;
+package com.example.demo.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
-import com.example.app.entity.TransferRule;
+import com.example.demo.entity.TransferRule;
 
 public interface TransferRuleRepo
         extends JpaRepository<TransferRule, Long> {
