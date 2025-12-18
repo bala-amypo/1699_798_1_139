@@ -25,7 +25,8 @@ public class University {
 
     public String getName() { return name; }
     public void setName(String name) { 
-      this.name=name;
+        if(name == null || name.isBlank()) throw new IllegalArgumentException("Name exists");
+        this.name = name; 
     }
 
     public String getAccreditationLevel() { return accreditationLevel; }
