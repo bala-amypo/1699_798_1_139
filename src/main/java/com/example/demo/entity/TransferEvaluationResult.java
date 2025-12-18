@@ -22,7 +22,7 @@ public class TransferEvaluationResult {
     private Boolean isEligibleForTransfer;
 
     
-    @column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     private Timestamp evaluatedAt =
             new Timestamp(System.currentTimeMillis());
 
