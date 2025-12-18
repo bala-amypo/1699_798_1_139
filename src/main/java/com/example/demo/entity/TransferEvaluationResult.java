@@ -22,7 +22,7 @@ public class TransferEvaluationResult {
     private Boolean isEligibleForTransfer;
 
     
-    @Column(nullable = false, updatable = false)
+    @column(nullable = false, updatable = false)
     private Timestamp evaluatedAt =
             new Timestamp(System.currentTimeMillis());
 
@@ -47,9 +47,7 @@ public class TransferEvaluationResult {
     public Boolean getIsEligibleForTransfer() { return isEligibleForTransfer; }
     public void setIsEligibleForTransfer(Boolean isEligibleForTransfer) { this.isEligibleForTransfer = isEligibleForTransfer; }
 
-    public LocalDateTime getEvaluatedAt() { return evaluatedAt; }
-    public void setEvaluatedAt(LocalDateTime evaluatedAt) { this.evaluatedAt = evaluatedAt; }
-
+       public Timestamp getEvaluatedAt() { return evaluatedAt; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 }
