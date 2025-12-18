@@ -1,7 +1,7 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import java.sql.timestamp;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "transfer_evaluation_results")
