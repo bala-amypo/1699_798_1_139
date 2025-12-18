@@ -1,4 +1,4 @@
-package com.example.app.entity;
+package com.example.demo.entity;
 
 import jakarta.persistence.*;
 
@@ -25,8 +25,7 @@ public class University {
 
     public String getName() { return name; }
     public void setName(String name) { 
-        if(name == null || name.isBlank()) throw new IllegalArgumentException("Name exists");
-        this.name = name; 
+      this.name=name;
     }
 
     public String getAccreditationLevel() { return accreditationLevel; }
@@ -37,12 +36,5 @@ public class University {
 
     public Boolean getActive() { return active; }
     public void setActive(Boolean active) { this.active = active; }
-    public Object getLocation() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getLocation'");
-    }
-    public void setLocation(Object location) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setLocation'");
-    }
+   
 }
