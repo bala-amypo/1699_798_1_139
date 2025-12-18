@@ -1,7 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.University;
-import com.example.demo.repository.UniversityRepository;
+import com.example.demo.repository.UniversityRepo;
 import com.example.demo.service.UniversityService;
 import org.springframework.stereotype.Service;
 
@@ -10,9 +10,9 @@ import java.util.List;
 @Service
 public class UniversityServiceImpl implements UniversityService {
 
-    private final UniversityRepository repository;
+    private final UniversityRepo repository;
 
-    public UniversityServiceImpl(UniversityRepository repository) {
+    public UniversityServiceImpl(UniversityRepo repository) {
         this.repository = repository;
     }
 
