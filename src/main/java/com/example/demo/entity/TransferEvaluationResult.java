@@ -15,8 +15,6 @@ public class TransferEvaluationResult {
     @Column(name = "course_id")
     private Long courseId; 
      
-     @Column(name = "evaluation_time")
-    private Timestamp evaluationTime;
 
     @Column(name = "result")
     private String result; 
@@ -30,11 +28,13 @@ public class TransferEvaluationResult {
     private Double overlapPercentage;
     private Integer creditHourDifference;
     private Boolean isEligibleForTransfer;
+   
+    @Column(nullable = false)
+    private Timestamp evaluatedAt;
 
-    
-    @Column(nullable = false, updatable = false)
-    private Timestamp evaluatedAt =
-            new Timestamp(System.currentTimeMillis());
+    @PrePersist
+    public void onCreate() {
+        this.evaluatedAt = new Timestamp(System.currentTimeMillis());
 
     private String notes;
 
