@@ -10,6 +10,10 @@ public class TransferEvaluationResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    
+    @Column(name = "course_id")
+    private Long courseId;   
 
     @ManyToOne(optional = false)
     private Course sourceCourse;
@@ -31,6 +35,14 @@ public class TransferEvaluationResult {
     // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+      public Long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Long courseId) {
+        this.courseId = courseId;
+    }
 
     public Course getSourceCourse() { return sourceCourse; }
     public void setSourceCourse(Course sourceCourse) { this.sourceCourse = sourceCourse; }
