@@ -11,9 +11,15 @@ public class TransferEvaluationResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    
+
     @Column(name = "course_id")
-    private Long courseId;   
+    private Long courseId; 
+     
+     @Column(name = "evaluation_time")
+    private Timestamp evaluationTime;
+
+    @Column(name = "result")
+    private String result; 
 
     @ManyToOne(optional = false)
     private Course sourceCourse;
