@@ -102,6 +102,7 @@ public class TransferEvaluationServiceImpl implements TransferEvaluationService 
 
     @Override
     public List<TransferEvaluationResult> getEvaluationsForCourse(Long courseId) {
-        return resultRepo.findByCourseId(courseId);
+        return resultRepo.findBySourceCourseId(courseId);
+
     }
 }
