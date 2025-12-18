@@ -46,7 +46,6 @@ public class TransferEvaluationServiceImpl implements TransferEvaluationService 
         TransferEvaluationResult result = new TransferEvaluationResult();
         result.setSourceCourse(source);
         result.setTargetCourse(target);
-        result.setEvaluatedAt(LocalDateTime.now());
 
         List<TransferRule> rules =
                 ruleRepo.findBySourceUniversityIdAndTargetUniversityIdAndActiveTrue(
