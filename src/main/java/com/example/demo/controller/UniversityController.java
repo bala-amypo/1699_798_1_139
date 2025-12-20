@@ -35,10 +35,9 @@ public class UniversityController {
         return service.getAllUniversities();
     }
 
-    @PutMapping("/api/universities/{id}/deactivate")
-public String deactivateUniversity(@PathVariable Long id) {
-    universityService.deactivate(id);
-    return "University deactivated successfully";
-}
+    @PutMapping("/{id}/deactivate")
+    public String deactivateUniversity(@PathVariable Long id) {
+        service.deactivate(id);
+        return "University deactivated successfully";
     }
 }
