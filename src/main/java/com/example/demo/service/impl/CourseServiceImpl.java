@@ -15,16 +15,30 @@ public class CourseServiceImpl implements CourseService {
     private CourseRepo courseRepo;
 
  
-    @Override
-    public Course updateCourse(Long id, Course course) {
-        return courseRepo.findById(id).map(existing -> {
-            existing.setCourseName(course.getCourseName());
-            existing.setCreditHours(course.getCreditHours());
-            existing.setDepartment(course.getDepartment());
-            existing.setUniversity(course.getUniversity());
-            return courseRepo.save(existing);
-        }).orElseThrow(() -> new RuntimeException("Course not found with id " + id));
-    }
+   @Override
+public Course updateCourse(Long id, Course course) {
+
+    return courseRepo.findById(id)
+            .map(existing -> {
+
+                if (course.getCourseName() != null)
+                    existing.setCourseName(course.getCourseName());
+
+                if (course.getCreditHours() != null)
+                    existing.setCreditHours(course.getCreditHours());
+
+                if (course.getDepartment() != null)
+                    existing.setDepartment(course.getDepartment());
+
+                if (course.getActive() != null)
+                    existing.setActive(course.getActive());
+
+                return courseRepo.save(existing);
+
+            }).orElseThrow(() ->
+                    new RuntimeException("Course not found with id " + id));
+}
+
 
     @Override
     public Course getCourseById(Long id) {
