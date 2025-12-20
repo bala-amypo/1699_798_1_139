@@ -11,12 +11,16 @@ public class TransferRule {
     private Long id;
 
     @ManyToOne(optional = false)
+    @JoinColumn(name = "source_university_id")
     private University sourceUniversity;
 
     @ManyToOne(optional = false)
+      @JoinColumn(name = "target_university_id")
     private University targetUniversity;
 
     @Column(nullable = false)
+    @Min(0)
+    @Max(100)
     private Double minimumOverlapPercentage;
 
     @Column(nullable = false)
