@@ -24,6 +24,7 @@ public class TransferRule {
     private Double minimumOverlapPercentage;
 
     @Column(nullable = false)
+    @Min(0)
     private Integer creditHourTolerance;
 
     @Column(nullable = false)
