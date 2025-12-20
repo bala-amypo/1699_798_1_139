@@ -88,7 +88,7 @@ public class TransferEvaluationServiceImpl implements TransferEvaluationService 
         result.setIsEligibleForTransfer(eligible);
 
         result.setNotes(
-                eligible ? "Eligible" : "No active rule satisfied"
+                 eligible ? "Eligible" : "Rule conditions not satisfied"
         );
 
         return resultRepo.save(result);
