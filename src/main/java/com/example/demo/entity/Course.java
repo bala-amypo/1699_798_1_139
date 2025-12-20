@@ -1,23 +1,29 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "courses", uniqueConstraints = @UniqueConstraint(columnNames = {"university_id", "courseCode"}))
+@Table(name = "courses",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"university_id", "courseCode"}))
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "university_id", nullable = false)
     private University university;
 
+    @NotBlank(message = "Course code is required")
     @Column(nullable = false)
     private String courseCode;
 
     private String courseName;
 
+    @NotNull(message = "Credit hours are required")
     @Column(nullable = false)
     private Integer creditHours;
 
@@ -42,7 +48,8 @@ public class Course {
 
     public Integer getCreditHours() { return creditHours; }
     public void setCreditHours(Integer creditHours) {
-        if(creditHours == null || creditHours <= 0) throw new IllegalArgumentException("CreditHours > 0");
+        if (creditHours == null || creditHours <= 0)
+            throw new IllegalArgumentException("CreditHours must be greater than 0");
         this.creditHours = creditHours;
     }
 
