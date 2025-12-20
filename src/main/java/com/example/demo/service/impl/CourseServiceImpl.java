@@ -45,8 +45,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course createCourse(Course course) {
-        return course;
-        
-    } 
+public Course createCourse(Course course) {
+    return courseRepo.save(course);
+}
+
 }
