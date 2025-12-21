@@ -23,18 +23,18 @@ public class TransferRuleServiceImpl implements TransferRuleService {
     public TransferRule createRule(TransferRule rule) {
 
         if (rule.getSourceUniversity() == null || rule.getTargetUniversity() == null) {
-            throw new RuntimeException("Source and Target universities are required");
+            throw new ResourceNotFoundException("Source and Target universities are required");
         }
 
         rule.setId(null);
 
         University source = universityRepo.findById(
                 rule.getSourceUniversity().getId()
-        ).orElseThrow(() -> new RuntimeException("Source university not found"));
+        ).orElseThrow(() -> new ResourceNotFoundException("Source university not found"));
 
         University target = universityRepo.findById(
                 rule.getTargetUniversity().getId()
-        ).orElseThrow(() -> new RuntimeException("Target university not found"));
+        ).orElseThrow(() -> new ResourceNotFoundException("Target university not found"));
 
         rule.setSourceUniversity(source);
         rule.setTargetUniversity(target);
@@ -47,19 +47,19 @@ public class TransferRuleServiceImpl implements TransferRuleService {
     public TransferRule updateRule(Long id, TransferRule rule) {
 
         TransferRule existing = ruleRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transfer rule not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Transfer rule not found"));
 
         if (rule.getSourceUniversity() == null || rule.getTargetUniversity() == null) {
-            throw new RuntimeException("Source and Target universities are required");
+            throw new ResourceNotFoundException("Source and Target universities are required");
         }
 
         University source = universityRepo.findById(
                 rule.getSourceUniversity().getId()
-        ).orElseThrow(() -> new RuntimeException("Source university not found"));
+        ).orElseThrow(() -> new ResourceNotFoundException("Source university not found"));
 
         University target = universityRepo.findById(
                 rule.getTargetUniversity().getId()
-        ).orElseThrow(() -> new RuntimeException("Target university not found"));
+        ).orElseThrow(() -> new ResourceNotFoundException("Target university not found"));
 
         existing.setSourceUniversity(source);
         existing.setTargetUniversity(target);
@@ -73,7 +73,7 @@ public class TransferRuleServiceImpl implements TransferRuleService {
     @Override
     public TransferRule getRuleById(Long id) {
         return ruleRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transfer rule not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Transfer rule not found"));
     }
 
     @Override
