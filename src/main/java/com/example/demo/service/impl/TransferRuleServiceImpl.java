@@ -19,30 +19,28 @@ public class TransferRuleServiceImpl implements TransferRuleService {
     @Autowired
     private UniversityRepo universityRepo;
 
-@Override
-public TransferRule createRule(TransferRule rule) {
+    @Override
+    public TransferRule createRule(TransferRule rule) {
 
-    if (rule.getSourceUniversity() == null || rule.getTargetUniversity() == null) {
-        throw new RuntimeException("Source and Target universities are required");
-    }
+        if (rule.getSourceUniversity() == null || rule.getTargetUniversity() == null) {
+            throw new RuntimeException("Source and Target universities are required");
+        }
 
-    rule.setId(null);
+        rule.setId(null);
 
-    University source = universityRepo.findById(
-            rule.getSourceUniversity().getId()
-    ).orElseThrow(() -> new RuntimeException("Source university not found"));
+        University source = universityRepo.findById(
+                rule.getSourceUniversity().getId()
+        ).orElseThrow(() -> new RuntimeException("Source university not found"));
 
-    University target = universityRepo.findById(
-            rule.getTargetUniversity().getId()
-    ).orElseThrow(() -> new RuntimeException("Target university not found"));
+        University target = universityRepo.findById(
+                rule.getTargetUniversity().getId()
+        ).orElseThrow(() -> new RuntimeException("Target university not found"));
 
-    rule.setSourceUniversity(source);
-    rule.setTargetUniversity(target);
-    rule.setActive(true);
+        rule.setSourceUniversity(source);
+        rule.setTargetUniversity(target);
+        rule.setActive(true);
 
-    return ruleRepo.save(rule);
-}
-
+        return ruleRepo.save(rule);
     }
 
     @Override
@@ -50,6 +48,10 @@ public TransferRule createRule(TransferRule rule) {
 
         TransferRule existing = ruleRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transfer rule not found"));
+
+        if (rule.getSourceUniversity() == null || rule.getTargetUniversity() == null) {
+            throw new RuntimeException("Source and Target universities are required");
+        }
 
         University source = universityRepo.findById(
                 rule.getSourceUniversity().getId()
