@@ -30,7 +30,7 @@ public class UniversityServiceImpl implements UniversityService {
     @Override
     public University updateUniversity(Long id, University univ) {
         University existing = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("University not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("University not found"));
 
         existing.setName(univ.getName());
         existing.setAccreditationLevel(univ.getAccreditationLevel());
@@ -42,7 +42,7 @@ public class UniversityServiceImpl implements UniversityService {
     @Override
     public University getUniversityById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("University not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("University not found"));
     }
 
     @Override
@@ -53,7 +53,7 @@ public class UniversityServiceImpl implements UniversityService {
     @Override
     public void deactivateUniversity(Long id) {
         University university = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("University not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("University not found"));
 
         university.setActive(false);
         repository.save(university);
