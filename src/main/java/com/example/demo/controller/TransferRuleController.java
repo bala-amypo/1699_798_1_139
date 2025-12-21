@@ -18,12 +18,12 @@ public class TransferRuleController {
     private TransferRuleService service;
 
     @PostMapping
-    public TransferRule create(@RequestBody TransferRule rule) {
+    public TransferRule create(@Valid @RequestBody TransferRule rule) {
         return service.createRule(rule);
     }
 
     @PutMapping("/{id}")
-    public TransferRule update(@PathVariable Long id, @RequestBody TransferRule rule) {
+    public TransferRule update(@PathVariable Long id,@Valid @RequestBody TransferRule rule) {
         return service.updateRule(id, rule);
     }
 
