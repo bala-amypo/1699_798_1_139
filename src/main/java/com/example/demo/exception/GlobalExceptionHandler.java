@@ -10,11 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
-public class ApiExceptionHandler {
+public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleResourceNotFound(
-            ResourceNotFoundException ex) {
+    public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
 
         Map<String, Object> error = new HashMap<>();
         error.put("timestamp", LocalDateTime.now());
@@ -23,18 +22,5 @@ public class ApiExceptionHandler {
         error.put("message", ex.getMessage());
 
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGenericException(
-            Exception ex) {
-
-        Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
-        error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        error.put("error", "Internal Server Error");
-        error.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
