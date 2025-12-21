@@ -5,6 +5,8 @@ import com.example.demo.repository.UniversityRepo;
 import com.example.demo.service.UniversityService;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.exception.ResourceNotFoundException;
+
 import java.util.List;
 
 @Service
