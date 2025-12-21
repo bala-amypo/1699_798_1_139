@@ -14,10 +14,13 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseRepo courseRepo;
 
- 
+     @Override
+public Course createCourse(Course course) {
+    return courseRepo.save(course);
+}
+
    @Override
 public Course updateCourse(Long id, Course course) {
-
     return courseRepo.findById(id)
             .map(existing -> {
 
@@ -36,14 +39,14 @@ public Course updateCourse(Long id, Course course) {
                 return courseRepo.save(existing);
 
             }).orElseThrow(() ->
-                    new RuntimeException("Course not found with id " + id));
+                    new ResourceNotFoundException("Course not found with id " + id));
 }
 
 
     @Override
     public Course getCourseById(Long id) {
         return courseRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found with id " + id));
     }
 
     @Override
@@ -58,9 +61,6 @@ public Course updateCourse(Long id, Course course) {
         courseRepo.save(course);
     }
 
-    @Override
-public Course createCourse(Course course) {
-    return courseRepo.save(course);
-}
+   
 
 }

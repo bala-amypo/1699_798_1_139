@@ -31,13 +31,13 @@ public class TransferEvaluationServiceImpl implements TransferEvaluationService 
     public TransferEvaluationResult evaluateTransfer(Long sourceCourseId, Long targetCourseId) {
 
         Course source = courseRepo.findById(sourceCourseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         Course target = courseRepo.findById(targetCourseId)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
         if (!source.getActive() || !target.getActive()) {
-            throw new RuntimeException("Course is not active");
+            throw new ResourceNotFoundException("Course is not active");
         }
 
         List<CourseContentTopic> sourceTopics = topicRepo.findByCourseId(sourceCourseId);
@@ -97,7 +97,7 @@ public class TransferEvaluationServiceImpl implements TransferEvaluationService 
     @Override
     public TransferEvaluationResult getEvaluationById(Long id) {
         return resultRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("not found"));
     }
 
     @Override
