@@ -19,24 +19,30 @@ public class TransferRuleServiceImpl implements TransferRuleService {
     @Autowired
     private UniversityRepo universityRepo;
 
-    @Override
-    public TransferRule createRule(TransferRule rule) {
+@Override
+public TransferRule createRule(TransferRule rule) {
 
-        rule.setId(null);
+    if (rule.getSourceUniversity() == null || rule.getTargetUniversity() == null) {
+        throw new RuntimeException("Source and Target universities are required");
+    }
 
-        University source = universityRepo.findById(
-                rule.getSourceUniversity().getId()
-        ).orElseThrow(() -> new RuntimeException("Source university not found"));
+    rule.setId(null);
 
-        University target = universityRepo.findById(
-                rule.getTargetUniversity().getId()
-        ).orElseThrow(() -> new RuntimeException("Target university not found"));
+    University source = universityRepo.findById(
+            rule.getSourceUniversity().getId()
+    ).orElseThrow(() -> new RuntimeException("Source university not found"));
 
-        rule.setSourceUniversity(source);
-        rule.setTargetUniversity(target);
-        rule.setActive(true);
+    University target = universityRepo.findById(
+            rule.getTargetUniversity().getId()
+    ).orElseThrow(() -> new RuntimeException("Target university not found"));
 
-        return ruleRepo.save(rule);
+    rule.setSourceUniversity(source);
+    rule.setTargetUniversity(target);
+    rule.setActive(true);
+
+    return ruleRepo.save(rule);
+}
+
     }
 
     @Override
