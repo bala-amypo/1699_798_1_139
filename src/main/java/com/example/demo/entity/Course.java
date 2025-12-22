@@ -12,6 +12,7 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", nullable = false)
