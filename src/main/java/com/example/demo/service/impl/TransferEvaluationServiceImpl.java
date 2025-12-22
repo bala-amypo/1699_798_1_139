@@ -109,11 +109,11 @@
 //     }
 // }
 
-package com.example.app.service.impl;
+package com.example.demo.service.impl;
 
-import com.example.app.entity.*;
-import com.example.app.repository.*;
-import com.example.app.service.TransferEvaluationService;
+import com.example.demo.entity.*;
+import com.example.demo.repository.*;
+import com.example.demo.service.TransferEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

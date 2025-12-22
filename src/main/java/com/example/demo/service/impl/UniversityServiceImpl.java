@@ -61,12 +61,12 @@
 //         repository.save(university);
 //     }
 // }
-package com.example.app.service.impl;
+package com.example.demo.service.impl;
 
-import com.example.app.entity.University;
-import com.example.app.exception.ResourceNotFoundException;
-import com.example.app.repository.UniversityRepository;
-import com.example.app.service.UniversityService;
+import com.example.demo.entity.University;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.UniversityRepository;
+import com.example.demo.service.UniversityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -93,13 +93,13 @@
 //     }
 // }
 
-package com.example.app.service.impl;
+package com.example.demo.service.impl;
 
-import com.example.app.entity.TransferRule;
-import com.example.app.entity.University;
-import com.example.app.repository.TransferRuleRepository;
-import com.example.app.repository.UniversityRepository;
-import com.example.app.service.TransferRuleService;
+import com.example.demo.entity.TransferRule;
+import com.example.demo.entity.University;
+import com.example.demo.repository.TransferRuleRepository;
+import com.example.demo.repository.UniversityRepository;
+import com.example.demo.service.TransferRuleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -63,12 +63,12 @@
 //         courseRepo.save(course);
 //     }
 // }
-package com.example.app.service.impl;
+package com.example.demo.service.impl;
 
-import com.example.app.entity.Course;
-import com.example.app.exception.ResourceNotFoundException;
-import com.example.app.repository.CourseRepository;
-import com.example.app.service.CourseService;
+import com.example.demo.entity.Course;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.CourseRepository;
+import com.example.demo.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
