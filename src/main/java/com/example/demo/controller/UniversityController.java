@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.app.entity.University;
-import com.example.app.service.UniversityService;
+import com.example.demo.entity.University;
+import com.example.demo.service.UniversityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
