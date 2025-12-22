@@ -1,30 +1,35 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "courses",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"university_id", "courseCode"}))
+@Table(
+    name = "courses",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"university_id", "course_code"})
+)
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "university_id", nullable = false)
     private University university;
 
     @NotBlank(message = "Course code is required")
-    @Column(nullable = false)
+    @Column(name = "course_code", nullable = false)
     private String courseCode;
 
     private String courseName;
 
     @NotNull(message = "Credit hours are required")
+    @Min(value = 1, message = "Credit hours must be greater than 0")
     @Column(nullable = false)
     private Integer creditHours;
 
@@ -33,6 +38,7 @@ public class Course {
 
     @Column(nullable = false)
     private Boolean active = true;
+
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -47,11 +53,7 @@ public class Course {
     public void setCourseName(String courseName) { this.courseName = courseName; }
 
     public Integer getCreditHours() { return creditHours; }
-    public void setCreditHours(Integer creditHours) {
-        if (creditHours == null || creditHours <= 0)
-            throw new IllegalArgumentException("CreditHours must be greater than 0");
-        this.creditHours = creditHours;
-    }
+    public void setCreditHours(Integer creditHours) { this.creditHours = creditHours; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
