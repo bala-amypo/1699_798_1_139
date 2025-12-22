@@ -1,58 +1,43 @@
-package com.example.demo.controller;
+package com.example.app.controller;
 
-import com.example.demo.entity.University;
-import com.example.demo.service.UniversityService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.example.app.entity.University;
+import com.example.app.service.UniversityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/universities")
+@Tag(name = "University API")
 public class UniversityController {
 
-    private final UniversityService service;
-
-    public UniversityController(UniversityService service) {
-        this.service = service;
-    }
+    @Autowired
+    private UniversityService service;
 
     @PostMapping
-    public ResponseEntity<University> create(@Valid @RequestBody University university) {
-        University created = service.createUniversity(university);
-       
-        return ResponseEntity
-                .created(URI.create("/api/universities/" + created.getId()))
-                .body(created);
+    public University create(@RequestBody University university) {
+        return service.createUniversity(university);
     }
 
-  
     @PutMapping("/{id}")
-    public ResponseEntity<University> update(@PathVariable Long id, @Valid @RequestBody University university) {
-        University updated = service.updateUniversity(id, university);
-        return ResponseEntity.ok(updated);
+    public University update(@PathVariable Long id, @RequestBody University university) {
+        return service.updateUniversity(id, university);
     }
 
-   
     @GetMapping("/{id}")
-    public ResponseEntity<University> getById(@PathVariable Long id) {
-        University univ = service.getUniversityById(id);
-        return ResponseEntity.ok(univ);
+    public University getById(@PathVariable Long id) {
+        return service.getUniversityById(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<University>> getAll() {
-        List<University> universities = service.getAllUniversities();
-        return ResponseEntity.ok(universities);
+    public List<University> getAll() {
+        return service.getAllUniversities();
     }
-   
-    @PutMapping("/{id}/deactivate")
-public ResponseEntity<String> deactivate(@PathVariable Long id) {
-    service.deactivateUniversity(id);
-    return ResponseEntity.ok("University deactivated successfully");
-}
 
+    @PutMapping("/{id}/deactivate")
+    public String deactivate(@PathVariable Long id) {
+        service.deactivateUniversity(id);
+        return "University deactivated successfully";
+    }
 }
