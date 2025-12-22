@@ -19,7 +19,7 @@ public class University {
     @Column(nullable = false)
     private Boolean active = true;
 
-    // Getters and Setters
+   
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
