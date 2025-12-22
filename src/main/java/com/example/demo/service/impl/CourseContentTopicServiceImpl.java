@@ -41,11 +41,11 @@
 //         return repo.save(existing);
 //     }
 // }
-package com.example.app.service.impl;
+package com.example.demo.service.impl;
 
-import com.example.app.entity.CourseContentTopic;
-import com.example.app.repository.CourseContentTopicRepository;
-import com.example.app.service.CourseContentTopicService;
+import com.example.demo.entity.CourseContentTopic;
+import com.example.demo.repository.CourseContentTopicRepository;
+import com.example.demo.service.CourseContentTopicService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
