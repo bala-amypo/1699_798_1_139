@@ -48,10 +48,11 @@ public class UniversityController {
         List<University> universities = service.getAllUniversities();
         return ResponseEntity.ok(universities);
     }
-
+   
     @PutMapping("/{id}/deactivate")
-    public ResponseEntity<University> deactivate(@PathVariable Long id) {
-        University deactivated = service.deactivateUniversity(id);
-        return ResponseEntity.ok(deactivated);
-    }
+public ResponseEntity<String> deactivate(@PathVariable Long id) {
+    service.deactivateUniversity(id);
+    return ResponseEntity.ok("University deactivated successfully");
+}
+
 }
