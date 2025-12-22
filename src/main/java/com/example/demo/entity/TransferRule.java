@@ -60,7 +60,7 @@
 //     public void setActive(Boolean active) { this.active = active; }
 // }
 
-package com.example.app.entity;
+package com.example.demo.entity;
 
 import jakarta.persistence.*;
 
