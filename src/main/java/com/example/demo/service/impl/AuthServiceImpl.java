@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public void register(RegisterRequest request) {
+    public String register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
@@ -95,11 +95,22 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(request.getRoles());
         userRepository.save(user);
+
+        // return JWT token after registration
+        return jwtTokenProvider.createToken(user.getId(), user.getRoles());
     }
 
-    public String login(String username) {
+    @Override
+    public String login(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Check password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        // Return JWT token
         return jwtTokenProvider.createToken(user.getId(), user.getRoles());
     }
 }
