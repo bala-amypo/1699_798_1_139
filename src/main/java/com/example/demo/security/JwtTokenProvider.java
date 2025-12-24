@@ -83,38 +83,45 @@ package com.example.demo.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
-
 import java.util.Date;
 import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String jwtSecret = "mySecretKey123456";
-    private final long jwtExpirationMs = 3600000; // 1 hour
+    private final String secret = "mySecretKey"; // your secret key
+    private final long expirationMs = 3600000;   // 1 hour expiration
 
-    // Create token
-   public String createToken(long userId, String email, Set<String> roles) {
-    Date now = new Date();
-    Date expiryDate = new Date(now.getTime() + expirationMs);
+    public String createToken(long userId, String email, Set<String> roles) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expirationMs);
 
-    return Jwts.builder()
-            .setSubject(Long.toString(userId))
-            .claim("email", email)
-            .claim("roles", roles)
-            .setIssuedAt(now)
-            .setExpiration(expiryDate)
-            .signWith(SignatureAlgorithm.HS512, secret)
-            .compact();
+        return Jwts.builder()
+                .setSubject(Long.toString(userId))
+                .claim("email", email)
+                .claim("roles", roles)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
+    }
+
+    public String getEmail(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("email", String.class);
+    }
+
+    public Set<String> getRoles(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("roles", Set.class);
+    }
 }
-  public String getEmail(String token) {
-    return Jwts.parser()
-            .setSigningKey(secret)
-            .parseClaimsJws(token)
-            .getBody()
-            .get("email", String.class);
-}
-
 
     // Validate token
     public boolean validateToken(String token) {
