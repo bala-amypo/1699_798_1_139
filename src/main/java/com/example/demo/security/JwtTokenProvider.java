@@ -155,3 +155,104 @@
 //                 .getBody();
 //     }
 // }
+
+
+package com.example.demo.security;
+
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+
+import javax.crypto.SecretKey;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class JwtTokenProvider {
+
+    // Secure 256-bit key for HS256
+    private final SecretKey secretKey;
+
+    // Token validity in milliseconds (e.g., 1 hour)
+    private final long validityInMs = 3600000;
+
+    public JwtTokenProvider() {
+        // Generate secure 256-bit key
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    }
+
+    /**
+     * Create JWT token with email, userId, and roles
+     */
+    public String createToken(String email, Long userId, List<String> roles) {
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("userId", userId);
+        claims.put("roles", roles);
+
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + validityInMs);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(secretKey)
+                .compact();
+    }
+
+    /**
+     * Get email (subject) from token
+     */
+    public String getEmail(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    /**
+     * Get userId from token
+     */
+    public Long getUserId(String token) {
+        Object userId = getClaims(token).get("userId");
+        if (userId instanceof Integer) {
+            return ((Integer) userId).longValue();
+        }
+        return (Long) userId;
+    }
+
+    /**
+     * Get roles from token
+     */
+    public List<String> getRoles(String token) {
+        Object rolesObj = getClaims(token).get("roles");
+        if (rolesObj instanceof List<?>) {
+            return ((List<?>) rolesObj).stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * Validate token
+     */
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Helper method to parse claims
+     */
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+}
