@@ -60,14 +60,10 @@
 // }
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtTokenProvider;
 import com.example.demo.service.AuthService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -81,30 +77,48 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    @Override
-    public void register(RegisterRequest registerRequest) {
-        User user = new User();
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setRoles(Set.of("ROLE_USER"));
-        userRepository.save(user);
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
+    // User registration
     @Override
-    public AuthResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+    public User register(User user) {
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
         }
 
-       String token = jwtTokenProvider.createToken(user.getId(), roles);
-        return new AuthResponse(user.getId(), user.getEmail(), token, user.getRoles());
+        // Encode password
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Save user
+        return userRepository.save(user);
+    }
+
+    // User login: generate JWT token
+    @Override
+    public String login(String username, String password) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // Check password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new IllegalArgumentException("Invalid password");
+        }
+
+        // Get user roles
+        Set<String> roles = user.getRoles();
+
+        // Generate JWT token
+        return jwtTokenProvider.createToken(user.getId(), roles);
+    }
+
+    // Optional: Validate token and extract user ID
+    public Long getUserIdFromToken(String token) {
+        if (!jwtTokenProvider.validateToken(token)) {
+            throw new IllegalArgumentException("Invalid token");
+        }
+        return jwtTokenProvider.getUserId(token);
     }
 }
