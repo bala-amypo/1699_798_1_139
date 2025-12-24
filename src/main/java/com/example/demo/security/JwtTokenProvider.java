@@ -107,6 +107,13 @@ public class JwtTokenProvider {
             .signWith(SignatureAlgorithm.HS512, secret)
             .compact();
 }
+  public String getEmail(String token) {
+    return Jwts.parser()
+            .setSigningKey(secret)
+            .parseClaimsJws(token)
+            .getBody()
+            .get("email", String.class);
+}
 
 
     // Validate token

@@ -22,10 +22,10 @@ public class User {
     public User() {
     }
 
-public User(String username, String password, String email, Set<String> roles){
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.roles = roles;
-    }
+public User(String username, String password, Set<String> roles) {
+    this.username = username;
+    this.password = password;
+    this.roles = roles;
+}
+
 }
