@@ -91,6 +91,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Set;
 import java.util.List;
+import io.jsonwebtoken.SignatureAlgorithm;
 
 
 @Component
