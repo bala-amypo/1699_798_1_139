@@ -58,8 +58,10 @@
 //         );
 //     }
 // }
+
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtTokenProvider;
@@ -67,8 +69,6 @@ import com.example.demo.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -82,43 +82,33 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // User registration
     @Override
-    public User register(User user) {
-        if (userRepository.existsByUsername(user.getUsername())) {
+    public String register(RegisterRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        // Encode password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRoles(request.getRoles());
 
-        // Save user
-        return userRepository.save(user);
+        user = userRepository.save(user);
+
+        // Return token after registration
+        return jwtTokenProvider.createToken(user.getId(), user.getRoles());
     }
 
-    // User login: generate JWT token
     @Override
     public String login(String username, String password) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Check password
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Invalid password");
         }
 
-        // Get user roles
-        Set<String> roles = user.getRoles();
-
-        // Generate JWT token
-        return jwtTokenProvider.createToken(user.getId(), roles);
-    }
-
-    // Optional: Validate token and extract user ID
-    public Long getUserIdFromToken(String token) {
-        if (!jwtTokenProvider.validateToken(token)) {
-            throw new IllegalArgumentException("Invalid token");
-        }
-        return jwtTokenProvider.getUserId(token);
+        return jwtTokenProvider.createToken(user.getId(), user.getRoles());
     }
 }
+
