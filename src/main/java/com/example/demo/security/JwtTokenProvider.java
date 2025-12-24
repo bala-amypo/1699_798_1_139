@@ -80,7 +80,9 @@
 // }
 package com.example.demo.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -89,37 +91,34 @@ import java.util.Set;
 @Component
 public class JwtTokenProvider {
 
-    // Secret key (in production, store securely in environment variables)
-    private final String jwtSecret = "mySecretKey";
+    private final String jwtSecret = "MySuperSecretKeyForJWTGeneration";
 
-    // Token validity: 24 hours
-    private final long jwtExpirationMs = 86400000;
+    private final long jwtExpirationInMs = 86400000; // 24 hours
 
-    // Generate JWT token using user ID and roles
+    // Generate token for login (used in AuthService)
     public String generateToken(Long userId, Set<String> roles) {
         return Jwts.builder()
-                .setSubject(userId.toString())
+                .setSubject(String.valueOf(userId))
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
     }
 
-    // Validate JWT token
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-            return true;
-        } catch (SignatureException | MalformedJwtException |
-                 ExpiredJwtException | UnsupportedJwtException |
-                 IllegalArgumentException ex) {
-            System.out.println("JWT validation error: " + ex.getMessage());
-        }
-        return false;
+    // Create token for tests (used in FullProjectTest)
+    public String createToken(long userId, String email, Set<String> roles) {
+        return Jwts.builder()
+                .setSubject(String.valueOf(userId))
+                .claim("email", email)
+                .claim("roles", roles)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                .signWith(SignatureAlgorithm.HS256, jwtSecret)
+                .compact();
     }
 
-    // Get user ID from token
+    // Extract user ID from token
     public Long getUserId(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
@@ -128,13 +127,32 @@ public class JwtTokenProvider {
         return Long.parseLong(claims.getSubject());
     }
 
-    // Get roles from token
+    // Extract roles from token
     @SuppressWarnings("unchecked")
     public Set<String> getRoles(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.get("roles", Set.class);
+        return (Set<String>) claims.get("roles");
+    }
+
+    // Extract email from token (used in FullProjectTest)
+    public String getEmail(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get("email", String.class);
+    }
+
+    // Validate token
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }
