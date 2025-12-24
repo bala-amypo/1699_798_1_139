@@ -94,20 +94,20 @@ public class JwtTokenProvider {
     private final long jwtExpirationMs = 3600000; // 1 hour
 
     // Create token
-    public String createToken(Long userId, Set<String> roles) {
-        Claims claims = Jwts.claims().setSubject(userId.toString());
-        claims.put("roles", roles);
+   public String createToken(long userId, String email, Set<String> roles) {
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + expirationMs);
 
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+    return Jwts.builder()
+            .setSubject(Long.toString(userId))
+            .claim("email", email)
+            .claim("roles", roles)
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .signWith(SignatureAlgorithm.HS512, secret)
+            .compact();
+}
 
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
-    }
 
     // Validate token
     public boolean validateToken(String token) {
