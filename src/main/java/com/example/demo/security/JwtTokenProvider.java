@@ -81,48 +81,52 @@
 
 package com.example.demo.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
-import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String secret = "mySecretKey";   // your secret key
-    private final long expirationMs = 3600000;     // token expiry: 1 hour
+    private static final String SECRET_KEY =
+            "mysecretkeymysecretkeymysecretkeymysecretkey"; // 32+ chars
 
-    // Create token with userId, email, roles
-    public String createToken(String email, Set<String> roles) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expirationMs);
+    private final Key key =
+            Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
+    public String generateToken(String email) {
         return Jwts.builder()
-                .claim("email", email)
-                .claim("roles", roles)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
+                .signWith(key)
                 .compact();
     }
 
-    // Extract email from token
-    public String getEmail(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
+    public String getEmailFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .get("email", String.class);
+                .getBody();
+
+        return claims.getSubject();
     }
 
-    // Extract roles from token
-    @SuppressWarnings("unchecked")
-    public Set<String> getRoles(String token) {
-        return (Set<String>) Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
-                .get("roles", Set.class);
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

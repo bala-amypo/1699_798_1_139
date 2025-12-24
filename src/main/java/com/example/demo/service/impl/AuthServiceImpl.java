@@ -59,21 +59,21 @@
 //     }
 // }
 
-package com.example.demo.service.impl;
+package com.example.app.service.impl;
 
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.entity.User;
-import com.example.demo.repository.UserRepository;
-import com.example.demo.security.JwtTokenProvider;
-import com.example.demo.service.AuthService;
-
+import com.example.app.dto.AuthResponse;
+import com.example.app.dto.LoginRequest;
+import com.example.app.dto.RegisterRequest;
+import com.example.app.entity.User;
+import com.example.app.repository.UserRepository;
+import com.example.app.security.JwtTokenProvider;
+import com.example.app.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -88,36 +88,47 @@ public class AuthServiceImpl implements AuthService {
     private JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public String register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
-        }
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+    public AuthResponse register(RegisterRequest request) {
+
+        // 1️⃣ Check if email already exists
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("User with this email already exists");
         }
 
-        User user = new User(
-                request.getUsername(),
-                request.getEmail(),
-                passwordEncoder.encode(request.getPassword()),
-                Collections.singleton("ROLE_USER")
-        );
+        // 2️⃣ Create new user
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword())); // password hashed
 
+        // 3️⃣ Assign role(s)
+        Set<String> roles = new HashSet<>();
+        roles.add(request.getRole()); // e.g. ROLE_USER
+        user.setRoles(roles);
+
+        // 4️⃣ Save user
         userRepository.save(user);
 
-        return jwtTokenProvider.createToken(user.getId(), user.getRoles());
+        // 5️⃣ Generate JWT token
+        String token = jwtTokenProvider.generateToken(user.getEmail());
+
+        return new AuthResponse(token);
     }
 
     @Override
-    public String login(String username, String password) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public AuthResponse login(LoginRequest request) {
 
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+        // 1️⃣ Fetch user by email
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+        // 2️⃣ Validate password
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid email or password");
         }
 
-       String token = jwtTokenProvider.createToken( user.getEmail(), user.getRoles());
+        // 3️⃣ Generate JWT token
+        String token = jwtTokenProvider.generateToken(user.getEmail());
 
+        return new AuthResponse(token);
     }
 }

@@ -1,10 +1,11 @@
-package com.example.demo.service;
+package com.example.app.service;
 
-import com.example.demo.dto.RegisterRequest;
-import com.example.demo.dto.LoginRequest;
-import com.example.demo.dto.AuthResponse;
+import com.example.app.dto.LoginRequest;
+import com.example.app.dto.RegisterRequest;
+import com.example.app.dto.AuthResponse;
 
 public interface AuthService {
-    String register(RegisterRequest request); // return token
-    String login(String username, String password); // return token
+    AuthResponse register(RegisterRequest request);
+    AuthResponse login(LoginRequest request);
+   
 }
