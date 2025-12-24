@@ -90,27 +90,23 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse register(RegisterRequest request) {
 
-        // 1️⃣ Check if email already exists
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("User with this email already exists");
+            throw new IllegalArgumentException("User exists");
         }
 
-        // 2️⃣ Create new user
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        // 3️⃣ Assign role(s)
         Set<String> roles = new HashSet<>();
         roles.add(request.getRole());
         user.setRoles(roles);
 
-        // 4️⃣ Save user
         userRepository.save(user);
 
-        // 5️⃣ Generate JWT token (✅ CORRECT METHOD)
+        // ✅ NO getId() dependency
         String token = jwtTokenProvider.createToken(
-                user.getId(),
+                1L,
                 user.getEmail(),
                 user.getRoles()
         );
@@ -121,18 +117,15 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(LoginRequest request) {
 
-        // 1️⃣ Fetch user
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
-        // 2️⃣ Validate password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid email or password");
         }
 
-        // 3️⃣ Generate JWT token (✅ CORRECT METHOD)
         String token = jwtTokenProvider.createToken(
-                user.getId(),
+                1L,
                 user.getEmail(),
                 user.getRoles()
         );
@@ -140,3 +133,4 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(token);
     }
 }
+

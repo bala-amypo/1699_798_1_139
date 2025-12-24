@@ -89,14 +89,14 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.Set;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
 
     private static final String SECRET =
-            "mysecretkeymysecretkeymysecretkey123456";
+            "mysecretkeymysecretkeymysecretkey123456"; // 32+ chars
 
     private static final long EXPIRATION = 86400000; // 1 day
 
@@ -104,6 +104,7 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
+    // ✅ USED BY AuthServiceImpl & TESTS
     public String createToken(Long userId, String email, Set<String> roles) {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put("userId", userId);
@@ -132,27 +133,6 @@ public class JwtTokenProvider {
         }
     }
 
-    public Long getUserId(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
-        return claims.get("userId", Long.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    public Set<String> getRoles(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
-        return Set.copyOf((List<String>) claims.get("roles"));
-    }
-
     public String getEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -160,5 +140,27 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public Long getUserId(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId", Long.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<String> getRoles(String token) {
+        List<String> roles =
+                (List<String>) Jwts.parserBuilder()
+                        .setSigningKey(getSigningKey())
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody()
+                        .get("roles");
+
+        return Set.copyOf(roles);
     }
 }
