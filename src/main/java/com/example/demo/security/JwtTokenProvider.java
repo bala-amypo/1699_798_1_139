@@ -1,12 +1,11 @@
 
 // package com.example.demo.security;
 
-// import io.jsonwebtoken.Claims;
-// import io.jsonwebtoken.Jwts;
-// import io.jsonwebtoken.SignatureAlgorithm;
+// import io.jsonwebtoken.*;
 // import io.jsonwebtoken.security.Keys;
 // import org.springframework.stereotype.Component;
 
+// import java.nio.charset.StandardCharsets;
 // import java.security.Key;
 // import java.util.Date;
 // import java.util.List;
@@ -15,151 +14,149 @@
 // @Component
 // public class JwtTokenProvider {
 
+//     // ✅ 256-bit+ SECRET (MANDATORY)
 //     private static final String SECRET =
-//             "mysecretkeymysecretkeymysecretkey123456"; // 32+ chars
+//             "this_is_a_very_secure_secret_key_for_hs256_algorithm_123456";
 
 //     private static final long EXPIRATION = 86400000; // 1 day
 
-//     private Key getSigningKey() {
-//         return Keys.hmacShaKeyFor(SECRET.getBytes());
-//     }
+//     private final Key key = Keys.hmacShaKeyFor(
+//             SECRET.getBytes(StandardCharsets.UTF_8)
+//     );
 
-//     // ✅ USED BY AuthServiceImpl & TESTS
+//     // ================= TOKEN CREATION =================
 //     public String createToken(Long userId, String email, Set<String> roles) {
-//         Claims claims = Jwts.claims().setSubject(email);
-//         claims.put("userId", userId);
-//         claims.put("roles", roles);
-
-//         Date now = new Date();
-//         Date expiry = new Date(now.getTime() + EXPIRATION);
 
 //         return Jwts.builder()
-//                 .setClaims(claims)
-//                 .setIssuedAt(now)
-//                 .setExpiration(expiry)
-//                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+//                 .setSubject(email)
+//                 .claim("userId", userId)
+//                 .claim("roles", roles)
+//                 .setIssuedAt(new Date())
+//                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+//                 .signWith(key, SignatureAlgorithm.HS256)
 //                 .compact();
 //     }
 
+//     // ================= VALIDATION =================
 //     public boolean validateToken(String token) {
 //         try {
 //             Jwts.parserBuilder()
-//                     .setSigningKey(getSigningKey())
+//                     .setSigningKey(key)
 //                     .build()
 //                     .parseClaimsJws(token);
 //             return true;
-//         } catch (Exception e) {
+//         } catch (JwtException | IllegalArgumentException e) {
 //             return false;
 //         }
 //     }
 
+//     // ================= REQUIRED =================
 //     public String getEmail(String token) {
-//         return Jwts.parserBuilder()
-//                 .setSigningKey(getSigningKey())
-//                 .build()
-//                 .parseClaimsJws(token)
-//                 .getBody()
-//                 .getSubject();
+//         return getClaims(token).getSubject();
 //     }
 
 //     public Long getUserId(String token) {
-//         return Jwts.parserBuilder()
-//                 .setSigningKey(getSigningKey())
-//                 .build()
-//                 .parseClaimsJws(token)
-//                 .getBody()
-//                 .get("userId", Long.class);
+//         Object value = getClaims(token).get("userId");
+//         if (value instanceof Integer) {
+//             return ((Integer) value).longValue();
+//         }
+//         return (Long) value;
 //     }
 
 //     @SuppressWarnings("unchecked")
 //     public Set<String> getRoles(String token) {
-//         List<String> roles =
-//                 (List<String>) Jwts.parserBuilder()
-//                         .setSigningKey(getSigningKey())
-//                         .build()
-//                         .parseClaimsJws(token)
-//                         .getBody()
-//                         .get("roles");
+//         return Set.copyOf((List<String>) getClaims(token).get("roles"));
+//     }
 
-//         return Set.copyOf(roles);
+//     // ================= INTERNAL =================
+//     private Claims getClaims(String token) {
+//         return Jwts.parserBuilder()
+//                 .setSigningKey(key)
+//                 .build()
+//                 .parseClaimsJws(token)
+//                 .getBody();
 //     }
 // }
-
 package com.example.demo.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 @Component
-public class JwtTokenProvider {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    // ✅ 256-bit+ SECRET (MANDATORY)
-    private static final String SECRET =
-            "this_is_a_very_secure_secret_key_for_hs256_algorithm_123456";
+    private final JwtTokenProvider jwtTokenProvider; // Your JWT utility class
+    private final UserDetailsService userDetailsService;
 
-    private static final long EXPIRATION = 86400000; // 1 day
-
-    private final Key key = Keys.hmacShaKeyFor(
-            SECRET.getBytes(StandardCharsets.UTF_8)
+    // Public URLs that don't require authentication
+    private static final List<String> PUBLIC_URLS = List.of(
+            "/auth",
+            "/api/auth",
+            "/swagger-ui",
+            "/swagger-ui.html",
+            "/swagger-ui/index.html",
+            "/v3/api-docs"
     );
 
-    // ================= TOKEN CREATION =================
-    public String createToken(Long userId, String email, Set<String> roles) {
-
-        return Jwts.builder()
-                .setSubject(email)
-                .claim("userId", userId)
-                .claim("roles", roles)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
+                                   UserDetailsService userDetailsService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
     }
 
-    // ================= VALIDATION =================
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        // Skip JWT check for public URLs
+        if (PUBLIC_URLS.stream().anyMatch(path::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
         }
-    }
 
-    // ================= REQUIRED =================
-    public String getEmail(String token) {
-        return getClaims(token).getSubject();
-    }
+        // Extract JWT from Authorization header
+        String token = getJwtFromRequest(request);
 
-    public Long getUserId(String token) {
-        Object value = getClaims(token).get("userId");
-        if (value instanceof Integer) {
-            return ((Integer) value).longValue();
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String username = jwtTokenProvider.getUsernameFromToken(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    userDetails, null, userDetails.getAuthorities()
+            );
+
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            // Set the authentication in the context
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        return (Long) value;
+
+        filterChain.doFilter(request, response);
     }
 
-    @SuppressWarnings("unchecked")
-    public Set<String> getRoles(String token) {
-        return Set.copyOf((List<String>) getClaims(token).get("roles"));
-    }
+    private String getJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
 
-    // ================= INTERNAL =================
-    private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+
+        return null;
     }
 }
