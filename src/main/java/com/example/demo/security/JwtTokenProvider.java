@@ -99,12 +99,19 @@ public class JwtTokenProvider {
     private final Key key =
             Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
-    public String generateToken(String email) {
+      public String createToken(Long userId, String email, Set<String> roles) {
+        Claims claims = Jwts.claims().setSubject(email);
+        claims.put("userId", userId);
+        claims.put("roles", roles);
+
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + EXPIRATION);
+
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
-                .signWith(key)
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
