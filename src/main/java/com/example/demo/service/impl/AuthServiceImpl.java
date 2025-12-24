@@ -62,15 +62,18 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtTokenProvider;
 import com.example.demo.service.AuthService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.Collections;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -79,24 +82,29 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private JwtTokenProvider jwtTokenProvider;
 
     @Override
     public String register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRoles(request.getRoles());
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = new User(
+                request.getUsername(),
+                request.getEmail(),
+                passwordEncoder.encode(request.getPassword()),
+                Collections.singleton("ROLE_USER")
+        );
+
         userRepository.save(user);
 
-        // return JWT token after registration
         return jwtTokenProvider.createToken(user.getId(), user.getRoles());
     }
 
@@ -105,12 +113,10 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check password
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new RuntimeException("Invalid credentials");
         }
 
-        // Return JWT token
         return jwtTokenProvider.createToken(user.getId(), user.getRoles());
     }
 }

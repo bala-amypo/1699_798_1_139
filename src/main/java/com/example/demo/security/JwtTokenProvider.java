@@ -82,67 +82,43 @@
 package com.example.demo.security;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+    private final String jwtSecret = "mySecretKey123456";
+    private final long jwtExpirationMs = 3600000; // 1 hour
 
-    @Value("${jwt.expiration}")
-    private long validityInMilliseconds; // e.g., 3600000 = 1h
-
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-    }
-
-    // Create token
-   public String createToken(Long userId, Set<String> roles) { ... }
-    public boolean validateToken(String token) { ... }
-     public Long getUserId(String token) { ... }
-
+    public String createToken(Long userId, Set<String> roles) {
+        Claims claims = Jwts.claims().setSubject(userId.toString());
+        claims.put("roles", roles);
 
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + validityInMilliseconds);
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
-    // Validate token
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
-    // Extract userId
     public Long getUserId(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
         return Long.parseLong(claims.getSubject());
-    }
-
-    // Extract roles
-    @SuppressWarnings("unchecked")
-    public Set<String> getRoles(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token).getBody();
-        return (Set<String>) claims.get("roles");
     }
 }

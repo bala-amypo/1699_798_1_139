@@ -1,12 +1,10 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.RegisterRequest;
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.AuthResponse;
 
 public interface AuthService {
-
-    // Must return JWT token after login
-    String login(String username, String password);
-
-    // Must return JWT token after registration
-    String register(RegisterRequest request);
+    String register(RegisterRequest request); // return token
+    String login(String username, String password); // return token
 }
