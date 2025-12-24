@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.Set;
 
 @Entity
-@Data // Generates getters, setters, toString, equals, and hashCode
+@Data
 public class User {
 
     @Id
@@ -18,4 +18,3 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles;
 }
-
