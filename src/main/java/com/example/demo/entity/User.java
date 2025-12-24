@@ -1,45 +1,30 @@
-// package com.example.demo.entity;
-
-// import jakarta.persistence.*;
-// import lombok.Data;
-// import java.util.Set;
-
-// @Entity
-// @Data
-// public class User {
-
-//     @Id
-//     @GeneratedValue(strategy = GenerationType.IDENTITY)
-//     private Long id;
-
-//     private String username;
-//     private String password;
-//     private String email;
-
-//     @ElementCollection(fetch = FetchType.EAGER)
-//     private Set<String> roles;
-
-//     public User() {
-//     }
-
-// public User(String username, String password, Set<String> roles) {
-//     this.username = username;
-//     this.password = password;
-//     this.roles = roles;
-// }
-
-// }
-
 package com.example.demo.entity;
 
+import jakarta.persistence.*;
 import java.util.Set;
 
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
     private String name;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "role")
     private Set<String> roles;
 
     public User() {
@@ -52,7 +37,6 @@ public class User {
         this.roles = roles;
     }
 
-    // ✅ ALREADY USED SOMEWHERE ELSE
     public User(String email, String password, String name, Set<String> roles) {
         this.email = email;
         this.password = password;
@@ -100,6 +84,3 @@ public class User {
         this.roles = roles;
     }
 }
-
-
-  
