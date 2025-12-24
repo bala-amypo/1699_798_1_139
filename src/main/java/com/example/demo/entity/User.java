@@ -39,13 +39,24 @@ public class User {
     private Long id;
     private String email;
     private String password;
+    private String name;
     private Set<String> roles;
 
-    public User() {}
+    public User() {
+    }
 
+    // ✅ REQUIRED BY TESTS
+    public User(String email, String password, Set<String> roles) {
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+    }
+
+    // ✅ ALREADY USED SOMEWHERE ELSE
     public User(String email, String password, String name, Set<String> roles) {
         this.email = email;
         this.password = password;
+        this.name = name;
         this.roles = roles;
     }
 
@@ -73,6 +84,14 @@ public class User {
         this.password = password;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Set<String> getRoles() {
         return roles;
     }
@@ -81,3 +100,6 @@ public class User {
         this.roles = roles;
     }
 }
+
+
+  
