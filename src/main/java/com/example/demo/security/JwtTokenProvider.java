@@ -165,20 +165,38 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String JWT_SECRET = "mySecretKey"; // Replace with your secure key
+    private final String JWT_SECRET = "mySecretKey"; // Replace with your secure secret
     private final long JWT_EXPIRATION = 24 * 60 * 60 * 1000; // 1 day
 
-    // Generate JWT token
+    // Generate simple token with username
     public String generateToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
 
         return Jwts.builder()
                 .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
+                .compact();
+    }
+
+    // ✅ New createToken method with userId, username, roles
+    public String createToken(long userId, String username, Set<String> roles) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
+
+        Claims claims = Jwts.claims().setSubject(username);
+        claims.put("userId", userId);
+        claims.put("roles", roles);
+
+        return Jwts.builder()
+                .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, JWT_SECRET)
@@ -195,7 +213,7 @@ public class JwtTokenProvider {
         }
     }
 
-    // ✅ Must-have method for your filter
+    // Extract username from JWT
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(JWT_SECRET)
@@ -205,4 +223,3 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 }
-
