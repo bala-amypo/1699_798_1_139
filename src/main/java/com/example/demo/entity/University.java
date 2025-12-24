@@ -16,7 +16,7 @@ public class University {
     private String accreditationLevel;
     private String country;
 
-    @Column(nullable = false)
+
     private Boolean active = true;
 
    
