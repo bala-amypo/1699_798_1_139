@@ -59,15 +59,15 @@
 //     }
 // }
 
-package com.example.app.service.impl;
+package com.example.demo.service.impl;
 
-import com.example.app.dto.AuthResponse;
-import com.example.app.dto.LoginRequest;
-import com.example.app.dto.RegisterRequest;
-import com.example.app.entity.User;
-import com.example.app.repository.UserRepository;
-import com.example.app.security.JwtTokenProvider;
-import com.example.app.service.AuthService;
+import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.LoginRequest;
+import com.example.demo.dto.RegisterRequest;
+import com.example.demo.entity.User;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.security.JwtTokenProvider;
+import com.example.demo.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
