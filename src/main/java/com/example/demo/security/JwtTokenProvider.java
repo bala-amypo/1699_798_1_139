@@ -91,40 +91,67 @@ import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String SECRET_KEY = "secret123";
-    private final long EXPIRATION = 86400000; // 1 day
+    private static final String SECRET_KEY = "secret123";
+    private static final long EXPIRATION = 86400000; // 1 day
 
+    // ================= TOKEN CREATION =================
     public String createToken(Long userId, String email, Set<String> roles) {
 
         return Jwts.builder()
                 .setSubject(email)
-                .claim("roles", roles)
                 .claim("userId", userId)
+                .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 
+    // ================= VALIDATION =================
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+            Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token);
             return true;
-        } catch (Exception e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
+    // ================= REQUIRED BY FILTER =================
     public String getEmail(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    // ================= REQUIRED BY TEST =================
+    public Long getUserId(String token) {
+        Object value = getClaims(token).get("userId");
+        if (value instanceof Integer) {
+            return ((Integer) value).longValue();
+        }
+        return (Long) value;
+    }
+
+    // ================= REQUIRED BY TEST =================
+    @SuppressWarnings("unchecked")
+    public Set<String> getRoles(String token) {
+        return Set.copyOf(
+                (List<String>) getClaims(token).get("roles")
+        );
+    }
+
+    // ================= INTERNAL =================
+    private Claims getClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 }
