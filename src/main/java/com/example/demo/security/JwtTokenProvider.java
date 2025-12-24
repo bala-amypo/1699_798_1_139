@@ -78,11 +78,13 @@
 //                 .getSubject();
 //     }
 // }
+
 package com.example.demo.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -91,11 +93,13 @@ import java.util.Set;
 @Component
 public class JwtTokenProvider {
 
-    private final String jwtSecret = "MySuperSecretKeyForJWTGeneration";
+    @Value("${jwt.secret}")
+    private String jwtSecret;
 
-    private final long jwtExpirationInMs = 86400000; // 24 hours
+    @Value("${jwt.expiration-ms}")
+    private long jwtExpirationInMs;
 
-    // Generate token for login (used in AuthService)
+    // Generate token for login
     public String generateToken(Long userId, Set<String> roles) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
@@ -106,7 +110,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // Create token for tests (used in FullProjectTest)
+    // Create token for tests
     public String createToken(long userId, String email, Set<String> roles) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
@@ -118,7 +122,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // Extract user ID from token
     public Long getUserId(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
@@ -127,7 +130,6 @@ public class JwtTokenProvider {
         return Long.parseLong(claims.getSubject());
     }
 
-    // Extract roles from token
     @SuppressWarnings("unchecked")
     public Set<String> getRoles(String token) {
         Claims claims = Jwts.parser()
@@ -137,7 +139,6 @@ public class JwtTokenProvider {
         return (Set<String>) claims.get("roles");
     }
 
-    // Extract email from token (used in FullProjectTest)
     public String getEmail(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
@@ -146,7 +147,6 @@ public class JwtTokenProvider {
         return claims.get("email", String.class);
     }
 
-    // Validate token
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
@@ -156,3 +156,4 @@ public class JwtTokenProvider {
         }
     }
 }
+
