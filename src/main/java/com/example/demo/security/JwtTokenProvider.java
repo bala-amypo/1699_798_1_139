@@ -105,9 +105,10 @@ public class JwtTokenProvider {
     }
 
     // Create token
-    public String createToken(Long userId, Set<String> roles) {
-        Claims claims = Jwts.claims().setSubject(userId.toString());
-        claims.put("roles", roles);
+   public String createToken(Long userId, Set<String> roles) { ... }
+    public boolean validateToken(String token) { ... }
+     public Long getUserId(String token) { ... }
+
 
         Date now = new Date();
         Date expiry = new Date(now.getTime() + validityInMilliseconds);

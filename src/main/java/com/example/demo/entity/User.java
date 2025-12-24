@@ -22,7 +22,7 @@ public class User {
     public User() {
     }
 
-    public User(String username, String password, String email, Set<String> roles) {
+public User(String username, String password, String email, Set<String> roles){
         this.username = username;
         this.password = password;
         this.email = email;
