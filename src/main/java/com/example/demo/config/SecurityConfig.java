@@ -1,58 +1,124 @@
+// package com.example.demo.config;
+
+// import com.example.demo.security.JwtAuthenticationFilter;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.security.config.Customizer;
+// import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+// import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// import org.springframework.security.crypto.password.PasswordEncoder;
+// import org.springframework.security.web.SecurityFilterChain;
+// import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+// @Configuration
+// @EnableWebSecurity
+// public class SecurityConfig {
+
+//     private final JwtAuthenticationFilter jwtFilter;
+
+//     public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
+//         this.jwtFilter = jwtFilter;
+//     }
+
+//     @Bean
+//     public PasswordEncoder passwordEncoder() {
+//         return new BCryptPasswordEncoder();
+//     }
+
+//     @Bean
+//     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+//         http
+//             .csrf(csrf -> csrf.disable())
+
+//             .authorizeHttpRequests(auth -> auth
+//                 // Public endpoints
+//                 .requestMatchers("/api/auth/**").permitAll()
+
+//                 // Swagger access
+//                 .requestMatchers(
+//                         "/v3/api-docs/**",
+//                         "/swagger-ui/**",
+//                         "/swagger-ui.html"
+//                 ).permitAll()
+
+//                 // All others require authentication
+//                 .anyRequest().authenticated()
+//             )
+
+//             // Add JWT filter
+//             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+
+//             .httpBasic(Customizer.withDefaults())
+//             .formLogin(form -> form.disable());
+
+//         return http.build();
+//     }
+// }
 package com.example.demo.config;
 
-import com.example.demo.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+// import org.springframework.http.HttpMethod;
+
+import com.example.demo.security.JwtAuthenticationFilter;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter) {
-        this.jwtFilter = jwtFilter;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable())
+                // Disable CSRF (JWT is stateless)
+                .csrf(csrf -> csrf.disable())
 
-            .authorizeHttpRequests(auth -> auth
-                // Public endpoints
-                .requestMatchers("/api/auth/**").permitAll()
+                // Stateless session
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // Swagger access
-                .requestMatchers(
-                        "/v3/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html"
-                ).permitAll()
+                // Authorization rules
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/auth/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html")
+                        .permitAll()
+                        // .requestMatchers(HttpMethod.POST, "/api/universities").permitAll()
 
-                // All others require authentication
-                .anyRequest().authenticated()
-            )
+                        .anyRequest().authenticated())
 
-            // Add JWT filter
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-
-            .httpBasic(Customizer.withDefaults())
-            .formLogin(form -> form.disable());
+                // Add JWT filter
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // Password Encoder
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // Authentication Manager
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }
