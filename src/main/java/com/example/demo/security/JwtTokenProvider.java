@@ -99,26 +99,14 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration-ms}")
     private long jwtExpirationInMs;
 
-    // Generate token for login
+    // example method
     public String generateToken(Long userId, Set<String> roles) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
-                .signWith(SignatureAlgorithm.HS256, jwtSecret)
-                .compact();
-    }
-
-    // Create token for tests
-    public String createToken(long userId, String email, Set<String> roles) {
-        return Jwts.builder()
-                .setSubject(String.valueOf(userId))
-                .claim("email", email)
-                .claim("roles", roles)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
-                .signWith(SignatureAlgorithm.HS256, jwtSecret)
+                .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8)), SignatureAlgorithm.HS256)
                 .compact();
     }
 
