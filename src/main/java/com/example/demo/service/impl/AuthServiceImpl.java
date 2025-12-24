@@ -98,18 +98,22 @@ public class AuthServiceImpl implements AuthService {
         // 2️⃣ Create new user
         User user = new User();
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); // password hashed
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         // 3️⃣ Assign role(s)
         Set<String> roles = new HashSet<>();
-        roles.add(request.getRole()); // e.g. ROLE_USER
+        roles.add(request.getRole());
         user.setRoles(roles);
 
         // 4️⃣ Save user
         userRepository.save(user);
 
-        // 5️⃣ Generate JWT token
-        String token = jwtTokenProvider.generateToken(user.getEmail());
+        // 5️⃣ Generate JWT token (✅ CORRECT METHOD)
+        String token = jwtTokenProvider.createToken(
+                user.getId(),
+                user.getEmail(),
+                user.getRoles()
+        );
 
         return new AuthResponse(token);
     }
@@ -117,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse login(LoginRequest request) {
 
-        // 1️⃣ Fetch user by email
+        // 1️⃣ Fetch user
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
@@ -126,8 +130,12 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Invalid email or password");
         }
 
-        // 3️⃣ Generate JWT token
-        String token = jwtTokenProvider.generateToken(user.getEmail());
+        // 3️⃣ Generate JWT token (✅ CORRECT METHOD)
+        String token = jwtTokenProvider.createToken(
+                user.getId(),
+                user.getEmail(),
+                user.getRoles()
+        );
 
         return new AuthResponse(token);
     }
