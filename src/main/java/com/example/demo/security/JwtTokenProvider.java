@@ -93,6 +93,7 @@ public class JwtTokenProvider {
     private final String jwtSecret = "mySecretKey123456";
     private final long jwtExpirationMs = 3600000; // 1 hour
 
+    // Create token
     public String createToken(Long userId, Set<String> roles) {
         Claims claims = Jwts.claims().setSubject(userId.toString());
         claims.put("roles", roles);
@@ -108,6 +109,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    // Validate token
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
@@ -117,8 +119,16 @@ public class JwtTokenProvider {
         }
     }
 
+    // Get userId from token
     public Long getUserId(String token) {
         Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
         return Long.parseLong(claims.getSubject());
+    }
+
+    // ✅ Extract roles from token
+    @SuppressWarnings("unchecked")
+    public Set<String> getRoles(String token) {
+        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+        return (Set<String>) claims.get("roles");
     }
 }
