@@ -94,7 +94,7 @@ public class JwtTokenProvider {
     private final long expirationMs = 3600000;     // token expiry: 1 hour
 
     // Create token with userId, email, roles
-    public String createToken(long userId, String email, Set<String> roles) {
+    public String createToken(String email, Set<String> roles) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
