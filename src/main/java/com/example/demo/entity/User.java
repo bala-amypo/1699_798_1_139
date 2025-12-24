@@ -14,7 +14,18 @@ public class User {
 
     private String username;
     private String password;
+    private String email;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles;
+
+    public User() {
+    }
+
+    public User(String username, String password, String email, Set<String> roles) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.roles = roles;
+    }
 }

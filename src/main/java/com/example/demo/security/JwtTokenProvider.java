@@ -97,29 +97,25 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration-ms}")
-    private long validityInMs;
+    @Value("${jwt.expiration}")
+    private long validityInMilliseconds; // e.g., 3600000 = 1h
 
-    // Generate signing key
     private Key getSigningKey() {
-        if (secretKey == null) {
-            throw new IllegalStateException("Secret key is not set!");
-        }
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Create JWT token
+    // Create token
     public String createToken(Long userId, Set<String> roles) {
         Claims claims = Jwts.claims().setSubject(userId.toString());
         claims.put("roles", roles);
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMs);
+        Date expiry = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(validity)
+                .setExpiration(expiry)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -134,14 +130,14 @@ public class JwtTokenProvider {
         }
     }
 
-    // Extract user ID from token
+    // Extract userId
     public Long getUserId(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
                 .parseClaimsJws(token).getBody();
         return Long.parseLong(claims.getSubject());
     }
 
-    // Extract roles from token
+    // Extract roles
     @SuppressWarnings("unchecked")
     public Set<String> getRoles(String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
@@ -149,4 +145,3 @@ public class JwtTokenProvider {
         return (Set<String>) claims.get("roles");
     }
 }
-
