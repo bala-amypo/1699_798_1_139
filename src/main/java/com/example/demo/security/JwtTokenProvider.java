@@ -81,7 +81,9 @@
 
 package com.example.demo.security;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -89,6 +91,7 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -98,13 +101,13 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration-ms}")
-    private long validityInMilliseconds;
+    // Token validity in milliseconds (1 hour)
+    private final long validityInMilliseconds = 3600000;
 
-    // Generate JWT token with userId and roles
+    // Create JWT token with userId and roles
     public String createToken(Long userId, Set<String> roles) {
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-        claims.put("roles", roles.stream().collect(Collectors.toList()));
+        claims.put("roles", roles);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -120,37 +123,43 @@ public class JwtTokenProvider {
     // Validate token
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+            Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
     // Extract userId from token
     public Long getUserId(String token) {
-        return Long.parseLong(getClaims(token).getSubject());
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return Long.parseLong(claims.getSubject());
     }
 
     // Extract roles from token
     @SuppressWarnings("unchecked")
     public Set<String> getRoles(String token) {
-        Claims claims = getClaims(token);
-        return claims.get("roles", java.util.List.class).stream()
-                .map(Object::toString)
-                .collect(Collectors.toSet());
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        List<String> rolesList = claims.get("roles", List.class);
+        return rolesList.stream().collect(Collectors.toSet());
     }
 
-    // Private helper methods
+    // Convert secret key string to Key object
     private Key getSigningKey() {
         if (secretKey == null || secretKey.isEmpty()) {
-            throw new IllegalArgumentException("JWT secret key cannot be null or empty!");
+            throw new IllegalStateException("JWT secret key is not configured!");
         }
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private Claims getClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build()
-                .parseClaimsJws(token).getBody();
     }
 }
