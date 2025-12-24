@@ -83,15 +83,17 @@ package com.example.demo.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
+
 import java.util.Date;
 import java.util.Set;
 
 @Component
 public class JwtTokenProvider {
 
-    private final String secret = "mySecretKey"; // your secret key
-    private final long expirationMs = 3600000;   // 1 hour expiration
+    private final String secret = "mySecretKey";   // your secret key
+    private final long expirationMs = 3600000;     // token expiry: 1 hour
 
+    // Create token with userId, email, roles
     public String createToken(long userId, String email, Set<String> roles) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
@@ -106,6 +108,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    // Extract email from token
     public String getEmail(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
@@ -114,35 +117,13 @@ public class JwtTokenProvider {
                 .get("email", String.class);
     }
 
+    // Extract roles from token
+    @SuppressWarnings("unchecked")
     public Set<String> getRoles(String token) {
-        return Jwts.parser()
+        return (Set<String>) Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody()
                 .get("roles", Set.class);
-    }
-}
-
-    // Validate token
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    // Get userId from token
-    public Long getUserId(String token) {
-        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-        return Long.parseLong(claims.getSubject());
-    }
-
-    // ✅ Extract roles from token
-    @SuppressWarnings("unchecked")
-    public Set<String> getRoles(String token) {
-        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-        return (Set<String>) claims.get("roles");
     }
 }
