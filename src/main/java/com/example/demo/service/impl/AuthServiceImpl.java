@@ -70,6 +70,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -83,32 +85,21 @@ public class AuthServiceImpl implements AuthService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public String register(RegisterRequest request) {
+    public void register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new RuntimeException("Username already exists");
         }
-
         User user = new User();
         user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(request.getRoles());
-
-        user = userRepository.save(user);
-
-        // Return token after registration
-        return jwtTokenProvider.createToken(user.getId(), user.getRoles());
+        userRepository.save(user);
     }
 
-    @Override
-    public String login(String username, String password) {
+    public String login(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("Invalid password");
-        }
-
+                .orElseThrow(() -> new RuntimeException("User not found"));
         return jwtTokenProvider.createToken(user.getId(), user.getRoles());
     }
 }
-
