@@ -160,5 +160,6 @@ public class UniversityServiceImpl implements UniversityService {
                 .orElseThrow(() -> new RuntimeException("University not found"));
         existing.setActive(false);
         repository.save(existing);
+          return "University deactivated successfully";
     }
 }
