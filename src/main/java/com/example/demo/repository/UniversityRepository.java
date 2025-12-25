@@ -9,4 +9,3 @@ public interface UniversityRepository extends JpaRepository<University, Long> {
 
     Optional<University> findByName(String name);
 }
-
