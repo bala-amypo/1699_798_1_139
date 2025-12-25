@@ -5,6 +5,7 @@ import com.example.demo.entity.University;
 import com.example.demo.repository.CourseRepository;
 import com.example.demo.repository.UniversityRepository;
 import com.example.demo.service.CourseService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,8 +14,10 @@ import java.util.List;
 public class CourseServiceImpl implements CourseService {
 
     // injected via reflection
+    @Autowired
     private CourseRepository repo;
-    @Auto
+
+    @Autowired
     private UniversityRepository univRepo;
 
     @Override

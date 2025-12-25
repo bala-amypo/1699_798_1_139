@@ -5,13 +5,15 @@ import com.example.demo.repository.TransferRuleRepository;
 import com.example.demo.repository.UniversityRepository;
 import com.example.demo.service.TransferRuleService;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Service
 public class TransferRuleServiceImpl implements TransferRuleService {
 
+    @Autowired
     private TransferRuleRepository repo;
+    @Autowired
     private UniversityRepository univRepo;
 
     @Override

@@ -4,15 +4,20 @@ import com.example.demo.entity.*;
 import com.example.demo.repository.*;
 import com.example.demo.service.TransferEvaluationService;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 
 @Service
 public class TransferEvaluationServiceImpl implements TransferEvaluationService {
-
+    
+    @Autowired
     private CourseRepository courseRepo;
+    @Autowired
     private CourseContentTopicRepository topicRepo;
+    @Autowired
     private TransferRuleRepository ruleRepo;
+    @Autowired
     private TransferEvaluationResultRepository resultRepo;
 
     @Override

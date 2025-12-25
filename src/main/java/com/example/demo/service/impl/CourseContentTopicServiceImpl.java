@@ -6,13 +6,15 @@ import com.example.demo.repository.CourseContentTopicRepository;
 import com.example.demo.repository.CourseRepository;
 import com.example.demo.service.CourseContentTopicService;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Service
 public class CourseContentTopicServiceImpl implements CourseContentTopicService {
 
+    @Autowired
     private CourseContentTopicRepository repo;
+    @Autowired
     private CourseRepository courseRepo;
 
     @Override
