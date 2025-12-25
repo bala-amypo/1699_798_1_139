@@ -1,5 +1,3 @@
-
-
 package com.example.demo.exception;
 
 import java.time.LocalDateTime;
