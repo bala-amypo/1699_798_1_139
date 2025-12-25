@@ -11,6 +11,7 @@ import java.util.List;
 public class UniversityServiceImpl implements UniversityService {
 
     // injected by reflection in tests
+    @Autowired
     private UniversityRepository repository;
 
     @Override
