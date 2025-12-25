@@ -122,7 +122,6 @@ public class UniversityServiceImpl implements UniversityService {
 
     private final UniversityRepository repository;
 
-    // ✅ Constructor injection
     public UniversityServiceImpl(UniversityRepository repository) {
         this.repository = repository;
     }
@@ -139,7 +138,6 @@ public class UniversityServiceImpl implements UniversityService {
         University existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("University not found"));
         existing.setName(university.getName());
-        existing.setLocation(university.getLocation());
         return repository.save(existing);
     }
 
@@ -159,7 +157,6 @@ public class UniversityServiceImpl implements UniversityService {
         University existing = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("University not found"));
         existing.setActive(false);
-        repository.save(existing);
-          return "University deactivated successfully";
+        repository.save(existing); // no return
     }
 }
