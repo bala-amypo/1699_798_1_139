@@ -109,53 +109,46 @@
 //     }
 // }
 
-package com.example.demo.service.impl;
+package com.example.demo.controller;
 
 import com.example.demo.entity.University;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.UniversityRepository;
 import com.example.demo.service.UniversityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 
-@Service
-public class UniversityServiceImpl implements UniversityService {
+@RestController
+@RequestMapping("/api/universities")
+@Tag(name = "University API")
+public class UniversityController {
 
     @Autowired
-    private UniversityRepository universityRepo;
+    private UniversityService service;
 
-    @Override
-    public University createUniversity(University univ) {
-        univ.setActive(true);
-        return universityRepo.save(univ);
+    @PostMapping
+    public University create(@RequestBody University university) {
+        return service.createUniversity(university);
     }
 
-    @Override
-    public University updateUniversity(Long id, University univ) {
-        return universityRepo.findById(id).map(existing -> {
-            existing.setName(univ.getName());
-            return universityRepo.save(existing);
-        }).orElseThrow(() -> new ResourceNotFoundException("University not found with id " + id));
+    @PutMapping("/{id}")
+    public University update(@PathVariable Long id, @RequestBody University university) {
+        return service.updateUniversity(id, university);
     }
 
-    @Override
-    public University getUniversityById(Long id) {
-        return universityRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("University not found with id " + id));
+    @GetMapping("/{id}")
+    public University getById(@PathVariable Long id) {
+        return service.getUniversityById(id);
     }
 
-    @Override
-    public List<University> getAllUniversities() {
-        return universityRepo.findAll();
+    @GetMapping
+    public List<University> getAll() {
+        return service.getAllUniversities();
     }
 
-    @Override
-    public void deactivateUniversity(Long id) {
-       University univ = universityRepo.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("University not found with id " + id));
-        univ.setActive(false);
-        universityRepo.save(univ);
+    @PutMapping("/{id}/deactivate")
+    public String deactivate(@PathVariable Long id) {
+        service.deactivateUniversity(id);
+        return "University deactivated successfully";
     }
 }
