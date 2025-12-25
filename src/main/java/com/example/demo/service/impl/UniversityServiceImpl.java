@@ -11,7 +11,12 @@ import java.util.List;
 public class UniversityServiceImpl implements UniversityService {
 
     // injected by reflection in tests
-    private UniversityRepository repository;
+    // private UniversityRepository repository;
+       private final UniversityRepository repository;
+
+    // ✅ Constructor injection
+    public UniversityServiceImpl(UniversityRepository repository) {
+        this.repository = repository;
 
     @Override
     public University createUniversity(University university) {
