@@ -14,6 +14,7 @@ public class CourseServiceImpl implements CourseService {
 
     // injected via reflection
     private CourseRepository repo;
+    @Auto
     private UniversityRepository univRepo;
 
     @Override

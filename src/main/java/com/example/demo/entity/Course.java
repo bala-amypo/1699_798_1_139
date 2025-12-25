@@ -12,6 +12,8 @@ public class Course {
     private String courseCode;
     private String courseName;
     private int creditHours;
+    private String description;
+    private String department;
     private boolean active = true;
 
     @ManyToOne
@@ -29,6 +31,12 @@ public class Course {
 
     public int getCreditHours() { return creditHours; }
     public void setCreditHours(int creditHours) { this.creditHours = creditHours; }
+
+     public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getDepartment() { return department; }
+    public void setDepartment(String department) { this.department = department; }
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
