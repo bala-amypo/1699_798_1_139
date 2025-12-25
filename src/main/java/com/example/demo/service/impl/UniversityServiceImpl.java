@@ -49,106 +49,63 @@
 //     }
 // }
 
-// package com.example.demo.service.impl;
-
-// import com.example.demo.entity.University;
-// import com.example.demo.repository.UniversityRepository;
-// import com.example.demo.service.UniversityService;
-// import org.springframework.stereotype.Service;
-
-// import java.util.List;
-
-// @Service
-// public class UniversityServiceImpl implements UniversityService {
-
-//     // injected by reflection in tests
-//     private UniversityRepository repository;
-
-//     @Override
-//     public University createUniversity(University university) {
-
-//         if (university == null || university.getName() == null || university.getName().trim().isEmpty()) {
-//             throw new IllegalArgumentException("Name required");
-//         }
-
-//         repository.findByName(university.getName()).ifPresent(u -> {
-//             throw new IllegalArgumentException("exists");
-//         });
-
-//         return repository.save(university);
-//     }
-
-//     @Override
-//     public University updateUniversity(Long id, University university) {
-//         University existing = repository.findById(id)
-//                 .orElseThrow(() -> new RuntimeException("not found"));
-
-//         if (university.getName() != null) {
-//             existing.setName(university.getName());
-//         }
-//         return repository.save(existing);
-//     }
-
-//     @Override
-//     public University getUniversityById(Long id) {
-//         return repository.findById(id)
-//                 .orElseThrow(() -> new RuntimeException("not found"));
-//     }
-
-//     @Override
-//     public void deactivateUniversity(Long id) {
-//         University u = repository.findById(id)
-//                 .orElseThrow(() -> new RuntimeException("not found"));
-//         u.setActive(false);
-//         repository.save(u);
-//     }
-
-//     @Override
-//     public List<University> getAllUniversities() {
-//         return repository.findAll();
-//     }
-// }
-
-package com.example.demo.controller;
+package com.example.demo.service.impl;
 
 import com.example.demo.entity.University;
+import com.example.demo.repository.UniversityRepository;
 import com.example.demo.service.UniversityService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
-@RestController
-@RequestMapping("/api/universities")
-@Tag(name = "University API")
-public class UniversityController {
+@Service
+public class UniversityServiceImpl implements UniversityService {
 
-    @Autowired
-    private UniversityService service;
+    // injected by reflection in tests
+    private UniversityRepository repository;
 
-    @PostMapping
-    public University create(@RequestBody University university) {
-        return service.createUniversity(university);
+    @Override
+    public University createUniversity(University university) {
+
+        if (university == null || university.getName() == null || university.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Name required");
+        }
+
+        repository.findByName(university.getName()).ifPresent(u -> {
+            throw new IllegalArgumentException("exists");
+        });
+
+        return repository.save(university);
     }
 
-    @PutMapping("/{id}")
-    public University update(@PathVariable Long id, @RequestBody University university) {
-        return service.updateUniversity(id, university);
+    @Override
+    public University updateUniversity(Long id, University university) {
+        University existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
+
+        if (university.getName() != null) {
+            existing.setName(university.getName());
+        }
+        return repository.save(existing);
     }
 
-    @GetMapping("/{id}")
-    public University getById(@PathVariable Long id) {
-        return service.getUniversityById(id);
+    @Override
+    public University getUniversityById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
     }
 
-    @GetMapping
-    public List<University> getAll() {
-        return service.getAllUniversities();
+    @Override
+    public void deactivateUniversity(Long id) {
+        University u = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("not found"));
+        u.setActive(false);
+        repository.save(u);
     }
 
-    @PutMapping("/{id}/deactivate")
-    public String deactivate(@PathVariable Long id) {
-        service.deactivateUniversity(id);
-        return "University deactivated successfully";
+    @Override
+    public List<University> getAllUniversities() {
+        return repository.findAll();
     }
 }
+
