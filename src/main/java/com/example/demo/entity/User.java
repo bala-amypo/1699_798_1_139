@@ -91,6 +91,7 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -108,6 +109,10 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles;
 
+    // ✅ FIX: created_at column
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
     // ✅ REQUIRED: No-arg constructor (JPA)
     public User() {
     }
@@ -119,12 +124,18 @@ public class User {
         this.roles = roles;
     }
 
-    // ✅ OPTIONAL: Full constructor (safe)
+    // ✅ OPTIONAL: Full constructor
     public User(Long id, String email, String password, Set<String> roles) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.roles = roles;
+    }
+
+    // ✅ AUTO-SET created_at before insert
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
     }
 
     // getters & setters
@@ -139,11 +150,11 @@ public class User {
     public String getEmail() {
         return email;
     }
-
+ 
     public void setEmail(String email) {
         this.email = email;
     }
-
+ 
     public String getPassword() {
         return password;
     }
@@ -151,12 +162,17 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-
+ 
     public Set<String> getRoles() {
         return roles;
     }
-
+ 
     public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }
+
