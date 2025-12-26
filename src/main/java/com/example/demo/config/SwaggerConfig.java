@@ -37,7 +37,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                // 🔐 JWT Security
+         
                 .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(
                         new Components().addSecuritySchemes(
@@ -49,7 +49,7 @@ public class SwaggerConfig {
                                         .bearerFormat("JWT")
                         )
                 )
-                // 🌐 Portal / Local Server
+                // 
                 .servers(List.of(
                         new Server().url("https://9224.pro604cr.amypo.ai/")
                 ));

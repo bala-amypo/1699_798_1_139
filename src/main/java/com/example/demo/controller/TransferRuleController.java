@@ -43,5 +43,6 @@ public class TransferRuleController {
     @PutMapping("/{id}/deactivate")
     public void deactivate(@PathVariable Long id) {
         service.deactivateRule(id);
+        return "University deactivated successfully";
     }
 }
