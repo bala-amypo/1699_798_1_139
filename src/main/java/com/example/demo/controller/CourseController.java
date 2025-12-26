@@ -38,8 +38,10 @@ public class CourseController {
     }
 
     @PutMapping("/{id}/deactivate")
-    public void deactivate(@PathVariable Long id) {
-        service.deactivateCourse(id);
-        return "University deactivated successfully";
-    }
+public String deactivate(@PathVariable Long id) {
+    service.deactivateCourse(id);
+    return "Course deactivated successfully";
+}
+
+
 }
