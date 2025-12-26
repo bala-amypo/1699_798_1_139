@@ -8,10 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-/**
- * Simple servlet to verify Tomcat deployment.
- * Required as per project specification.
- */
 public class SimpleStatusServlet extends HttpServlet {
 
     @Override

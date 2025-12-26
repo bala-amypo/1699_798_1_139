@@ -11,7 +11,6 @@ import java.util.List;
 @Service
 public class UniversityServiceImpl implements UniversityService {
 
-    // injected by reflection in tests
     @Autowired
     private UniversityRepository repository;
 
