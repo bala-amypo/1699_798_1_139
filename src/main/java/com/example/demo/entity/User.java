@@ -19,22 +19,19 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles;
 
-    // ✅ FIX: created_at column
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // ✅ REQUIRED: No-arg constructor (JPA)
     public User() {
     }
 
-    // ✅ REQUIRED: Constructor used by TESTS
     public User(String email, String password, Set<String> roles) {
         this.email = email;
         this.password = password;
         this.roles = roles;
     }
 
-    // ✅ OPTIONAL: Full constructor
+
     public User(Long id, String email, String password, Set<String> roles) {
         this.id = id;
         this.email = email;
@@ -42,13 +39,11 @@ public class User {
         this.roles = roles;
     }
 
-    // ✅ AUTO-SET created_at before insert
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
-    // getters & setters
     public Long getId() {
         return id;
     }

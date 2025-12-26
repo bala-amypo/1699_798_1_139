@@ -13,7 +13,6 @@ import java.util.List;
 @Service
 public class CourseServiceImpl implements CourseService {
 
-    // injected via reflection
     @Autowired
     private CourseRepository repo;
 

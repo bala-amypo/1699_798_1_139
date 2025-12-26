@@ -13,7 +13,6 @@ import java.util.Set;
 @Component
 public class JwtTokenProvider {
 
-    // ✅ 256-bit+ SECRET (MANDATORY)
     private static final String SECRET =
             "this_is_a_very_secure_secret_key_for_hs256_algorithm_123456";
 
@@ -23,7 +22,6 @@ public class JwtTokenProvider {
             SECRET.getBytes(StandardCharsets.UTF_8)
     );
 
-    // ================= TOKEN CREATION =================
     public String createToken(Long userId, String email, Set<String> roles) {
 
         return Jwts.builder()
@@ -36,7 +34,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // ================= VALIDATION =================
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()
@@ -49,7 +46,6 @@ public class JwtTokenProvider {
         }
     }
 
-    // ================= REQUIRED =================
     public String getEmail(String token) {
         return getClaims(token).getSubject();
     }
@@ -67,7 +63,6 @@ public class JwtTokenProvider {
         return Set.copyOf((List<String>) getClaims(token).get("roles"));
     }
 
-    // ================= INTERNAL =================
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
